@@ -1,0 +1,28 @@
+name: mini_task_manager
+description: A Mini Task Manager with Firebase Auth, Firestore, FormBuilder, Dio, and BLoC (Cubit).
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.0.0
+  equatable: ^2.0.5
+  dio: ^5.5.0+1
+  flutter_form_builder: ^10.2.0
+  form_builder_validators: ^11.2.0
+  firebase_core: ^3.4.0
+  firebase_auth: ^5.3.0
+  cloud_firestore: ^5.4.0
+  shared_preferences: ^2.5.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
