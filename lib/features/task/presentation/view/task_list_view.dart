@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:mini_task_manager/features/task/presentation/cubit/task_cubit.dart';
+import 'package:mini_task_manager/core/routes/app_routes.dart';
+import 'package:mini_task_manager/features/task/presentation/cubit/task_list_cubit.dart';
 
 class TaskListView extends StatelessWidget {
   const TaskListView({super.key});
@@ -61,8 +62,11 @@ class TaskListView extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
-        onPressed: () {
-          // Navigate to Add Task Form Page
+        onPressed: () async {
+          final result = await Navigator.pushNamed(context, AppRoutes.taskForm);
+          if (result == true) {
+            context.read<TaskListCubit>().loadTasks();
+          }
         },
       ),
     );

@@ -1,1 +1,0 @@
-// Cubit for splash feature 

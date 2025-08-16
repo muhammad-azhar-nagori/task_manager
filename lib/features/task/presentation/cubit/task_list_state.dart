@@ -1,4 +1,4 @@
-part of 'task_cubit.dart';
+part of 'task_list_cubit.dart';
 
 abstract class TaskListState {}
 

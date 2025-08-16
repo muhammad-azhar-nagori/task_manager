@@ -1,1 +1,0 @@
-// States for splash feature 
