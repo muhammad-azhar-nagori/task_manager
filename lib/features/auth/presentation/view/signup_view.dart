@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:mini_task_manager/core/routes/app_routes.dart';
 import '../cubit/auth_cubit.dart';
 
 class SignupView extends StatelessWidget {
@@ -52,31 +53,38 @@ class SignupView extends StatelessWidget {
                   return null;
                 },
               ),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => SignupView()),
-                  );
-                },
-                child: const Text("Don't have an account? Sign up"),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Already have an account? "),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, AppRoutes.login);
+                    },
+                    child: const Text("Login"),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
               BlocConsumer<AuthCubit, AuthState>(
                 listener: (context, state) {
-                  if (state is AuthError) {
+                  if (state.status == AuthStatus.error) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(state.message)),
+                      SnackBar(content: Text(state.message ?? 'Error')),
                     );
-                  } else if (state is AuthSuccess) {
+                  } else if (state.status == AuthStatus.success) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Signup Successful')),
                     );
-                    Navigator.pop(context); // go back to login page
+                    Navigator.pushReplacementNamed(
+                      context,
+                      AppRoutes.taskList,
+                    );
                   }
                 },
                 builder: (context, state) {
-                  if (state is AuthLoading) {
+                  if (state.status == AuthStatus.loading) {
                     return const CircularProgressIndicator();
                   }
                   return ElevatedButton(
@@ -89,7 +97,7 @@ class SignupView extends StatelessWidget {
                             );
                       }
                     },
-                    child: const Text('Sign Up'),
+                    child: const Text('Sign up'),
                   );
                 },
               ),

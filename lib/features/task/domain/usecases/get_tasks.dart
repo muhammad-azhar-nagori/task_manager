@@ -6,7 +6,7 @@ class GetTasks {
 
   GetTasks(this.repository);
 
-  Future<List<TaskEntity>> call() {
-    return repository.getTasks();
+  Future<List<TaskEntity>> call() async {
+    return await repository.getTasks();
   }
 }

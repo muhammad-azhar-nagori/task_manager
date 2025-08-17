@@ -7,9 +7,9 @@ abstract class FirebaseAuthDataSource {
 }
 
 class FirebaseAuthDataSourceImpl implements FirebaseAuthDataSource {
-  final FirebaseAuth _firebaseAuth;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  FirebaseAuthDataSourceImpl(this._firebaseAuth);
+  FirebaseAuthDataSourceImpl();
 
   @override
   Future<User?> signIn(String email, String password) async {

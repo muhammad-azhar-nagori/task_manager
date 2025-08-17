@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mini_task_manager/core/routes/app_routes.dart';
@@ -16,21 +18,23 @@ class _SplashViewState extends State<SplashView> {
     _navigate();
   }
 
-  void _navigate() {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      Navigator.pushReplacementNamed(
-        context,
-        AppRoutes.taskList,
-      );
-    } else {
-      Navigator.pushReplacementNamed(
-        context,
-        AppRoutes.signin,
-      );
-    }
-  }
+  Future<void> _navigate() async {
+    final User? user = FirebaseAuth.instance.currentUser;
+    await Future.delayed(Durations.extralong4);
+   
+        if (user != null) {
+          Navigator.pushReplacementNamed(
+            context,
+            AppRoutes.taskList,
+          );
+        } else {
+          Navigator.pushReplacementNamed(
+            context,
+            AppRoutes.login,
+          );
+        }
+      }
+  
 
   @override
   Widget build(BuildContext context) {

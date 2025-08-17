@@ -6,7 +6,7 @@ class SignUp {
 
   SignUp(this.repository);
 
-  Future<UserEntity?> call(String email, String password) {
-    return repository.signUp(email, password);
+  Future<UserEntity?> call(String email, String password) async {
+    return await repository.signUp(email, password);
   }
 }

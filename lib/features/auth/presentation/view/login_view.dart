@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:mini_task_manager/core/routes/app_routes.dart';
 import '../cubit/auth_cubit.dart';
 
 class LoginView extends StatelessWidget {
@@ -18,6 +19,8 @@ class LoginView extends StatelessWidget {
         child: FormBuilder(
           key: _formKey,
           child: Column(
+            spacing: 12,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               FormBuilderTextField(
                 name: 'email',
@@ -33,21 +36,24 @@ class LoginView extends StatelessWidget {
                 decoration: const InputDecoration(labelText: 'Password'),
                 validator: FormBuilderValidators.required(),
               ),
-              const SizedBox(height: 20),
               BlocConsumer<AuthCubit, AuthState>(
                 listener: (context, state) {
-                  if (state is AuthError) {
+                  if (state.status == AuthStatus.error) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(state.message)),
+                      SnackBar(content: Text(state.message ?? 'Error')),
                     );
-                  } else if (state is AuthSuccess) {
+                  } else if (state.status == AuthStatus.success) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Login Successful')),
+                    );
+                    Navigator.pushReplacementNamed(
+                      context,
+                      AppRoutes.taskList,
                     );
                   }
                 },
                 builder: (context, state) {
-                  if (state is AuthLoading) {
+                  if (state.status == AuthStatus.loading) {
                     return const CircularProgressIndicator();
                   }
                   return ElevatedButton(
@@ -63,6 +69,18 @@ class LoginView extends StatelessWidget {
                     child: const Text('Login'),
                   );
                 },
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Don't have an account? "),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, AppRoutes.signup);
+                    },
+                    child: const Text("Sign up"),
+                  ),
+                ],
               ),
             ],
           ),

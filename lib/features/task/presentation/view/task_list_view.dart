@@ -1,11 +1,20 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mini_task_manager/core/routes/app_routes.dart';
-import 'package:mini_task_manager/features/task/presentation/cubit/task_list_cubit.dart';
+import 'package:mini_task_manager/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:mini_task_manager/features/task/presentation/cubit/task_cubit.dart';
+import 'package:mini_task_manager/features/task/presentation/widgets/task_item_widget.dart';
 
-class TaskListView extends StatelessWidget {
+class TaskListView extends StatefulWidget {
   const TaskListView({super.key});
 
+  @override
+  State<TaskListView> createState() => _TaskListViewState();
+}
+
+class _TaskListViewState extends State<TaskListView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,58 +23,54 @@ class TaskListView extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => context.read<TaskListCubit>().loadTasks(),
+            onPressed: () => context.read<TaskCubit>().loadTasks(),
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await context.read<AuthCubit>().signOut();
+              Navigator.pushReplacementNamed(context, AppRoutes.login);
+            },
           )
         ],
       ),
-      body: BlocBuilder<TaskListCubit, TaskListState>(
-        builder: (context, state) {
-          if (state is TaskListLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is TaskListLoaded) {
-            if (state.tasks.isEmpty) {
-              return const Center(child: Text("No tasks yet"));
-            }
-            return ListView.builder(
-              itemCount: state.tasks.length,
-              itemBuilder: (context, index) {
-                final task = state.tasks[index];
-                return ListTile(
-                  title: Text(
-                    task.title,
-                    style: TextStyle(
-                      decoration: task.isDone
-                          ? TextDecoration.lineThrough
-                          : TextDecoration.none,
-                    ),
-                  ),
-                  subtitle:
-                      task.description != null ? Text(task.description!) : null,
-                  leading: Checkbox(
-                    value: task.isDone,
-                    onChanged: (_) =>
-                        context.read<TaskListCubit>().toggleTaskStatus(task),
-                  ),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () =>
-                        context.read<TaskListCubit>().removeTask(task.id),
-                  ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: BlocBuilder<TaskCubit, TaskState>(
+          builder: (context, state) {
+            final cubit = context.read<TaskCubit>();
+
+            switch (state.status) {
+              case TaskListStatus.loading:
+                return const Center(child: CircularProgressIndicator());
+
+              case TaskListStatus.loaded:
+              case TaskListStatus.submitting:
+              case TaskListStatus.submitted:
+                if (state.tasks.isEmpty) {
+                  return const Center(child: Text("No tasks yet"));
+                }
+                return ListView.builder(
+                  itemCount: state.tasks.length,
+                  itemBuilder: (context, index) {
+                    final task = state.tasks[index];
+                    return CustomTile(task: task, cubit: cubit);
+                  },
                 );
-              },
-            );
-          } else if (state is TaskListError) {
-            return Center(child: Text("Error: ${state.message}"));
-          }
-          return const SizedBox.shrink();
-        },
+
+              case TaskListStatus.error:
+                return Center(child: Text("Error: ${state.errorMessage}"));
+            }
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add),
         onPressed: () async {
+          final cubit = context.read<TaskCubit>();
           final result = await Navigator.pushNamed(context, AppRoutes.taskForm);
           if (result == true) {
-            context.read<TaskListCubit>().loadTasks();
+            cubit.loadTasks();
           }
         },
       ),

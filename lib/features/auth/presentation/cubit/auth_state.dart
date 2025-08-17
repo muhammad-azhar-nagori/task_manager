@@ -1,17 +1,23 @@
 part of 'auth_cubit.dart';
 
-abstract class AuthState {}
+enum AuthStatus { initial, loading, success, error }
 
-class AuthInitial extends AuthState {}
+class AuthState {
+  final AuthStatus status;
+  final String? message;
 
-class AuthLoading extends AuthState {}
+  const AuthState({
+    this.status = AuthStatus.initial,
+    this.message,
+  });
 
-class AuthSuccess extends AuthState {
-  final UserEntity? user;
-  AuthSuccess(this.user);
-}
-
-class AuthError extends AuthState {
-  final String message;
-  AuthError(this.message);
+  AuthState copyWith({
+    AuthStatus? status,
+    String? message,
+  }) {
+    return AuthState(
+      status: status ?? this.status,
+      message: message ?? this.message,
+    );
+  }
 }

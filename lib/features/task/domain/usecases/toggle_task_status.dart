@@ -5,7 +5,7 @@ class ToggleTaskStatus {
 
   ToggleTaskStatus(this.repository);
 
-  Future<void> call(String taskId, bool isDone) {
-    return repository.toggleTaskStatus(taskId, isDone);
+  Future<void> call(String taskId, bool isDone) async {
+    return await repository.toggleTaskStatus(taskId, isDone);
   }
 }
