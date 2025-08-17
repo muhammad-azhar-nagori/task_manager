@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mini_task_manager/core/routes/app_routes.dart';
 import 'package:mini_task_manager/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:mini_task_manager/features/quote/presentation/cubit/quote_cubit.dart';
+import 'package:mini_task_manager/features/quote/presentation/cubit/quote_state.dart';
 import 'package:mini_task_manager/features/task/presentation/cubit/task_cubit.dart';
 import 'package:mini_task_manager/features/task/presentation/widgets/task_item_widget.dart';
 
@@ -36,32 +38,76 @@ class _TaskListViewState extends State<TaskListView> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: BlocBuilder<TaskCubit, TaskState>(
-          builder: (context, state) {
-            final cubit = context.read<TaskCubit>();
-
-            switch (state.status) {
-              case TaskListStatus.loading:
-                return const Center(child: CircularProgressIndicator());
-
-              case TaskListStatus.loaded:
-              case TaskListStatus.submitting:
-              case TaskListStatus.submitted:
-                if (state.tasks.isEmpty) {
-                  return const Center(child: Text("No tasks yet"));
+        child: Column(
+          children: [
+            BlocBuilder<QuoteCubit, QuoteState>(
+              builder: (context, state) {
+                if (state is QuoteLoading) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (state is QuoteLoaded) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          '"${state.quote.author}"',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              fontStyle: FontStyle.italic, fontSize: 16),
+                        ),
+                        const SizedBox(height: 4),
+                        Text('- ${state.quote.content}',
+                            style: const TextStyle(fontSize: 14)),
+                      ],
+                    ),
+                  );
+                } else if (state is QuoteError) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text(
+                      'Error loading quote',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  );
                 }
-                return ListView.builder(
-                  itemCount: state.tasks.length,
-                  itemBuilder: (context, index) {
-                    final task = state.tasks[index];
-                    return CustomTile(task: task, cubit: cubit);
-                  },
-                );
+                return const SizedBox.shrink();
+              },
+            ),
+            const Divider(),
+            Expanded(
+              child: BlocBuilder<TaskCubit, TaskState>(
+                builder: (context, state) {
+                  final cubit = context.read<TaskCubit>();
 
-              case TaskListStatus.error:
-                return Center(child: Text("Error: ${state.errorMessage}"));
-            }
-          },
+                  switch (state.status) {
+                    case TaskListStatus.loading:
+                      return const Center(child: CircularProgressIndicator());
+
+                    case TaskListStatus.loaded:
+                    case TaskListStatus.submitting:
+                    case TaskListStatus.submitted:
+                      if (state.tasks.isEmpty) {
+                        return const Center(child: Text("No tasks yet"));
+                      }
+                      return ListView.builder(
+                        itemCount: state.tasks.length,
+                        itemBuilder: (context, index) {
+                          final task = state.tasks[index];
+                          return CustomTile(task: task, cubit: cubit);
+                        },
+                      );
+
+                    case TaskListStatus.error:
+                      return Center(
+                          child: Text("Error: ${state.errorMessage}"));
+                  }
+                },
+              ),
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(

@@ -12,12 +12,11 @@ class ApiService {
   }
 
   /// Generic GET request
-  Future<Map<String, dynamic>> get(String url,
-      {Map<String, dynamic>? queryParams}) async {
+  Future<T> get<T>(String url, {Map<String, dynamic>? queryParams}) async {
     try {
-      final response = await _dio.get(url, queryParameters: queryParams);
+      final response = await _dio.get<T>(url, queryParameters: queryParams);
       _validateResponse(response);
-      return response.data as Map<String, dynamic>;
+      return response.data as T;
     } on DioException catch (e) {
       throw ApiException(_handleDioError(e));
     } catch (e) {
