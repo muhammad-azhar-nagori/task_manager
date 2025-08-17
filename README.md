@@ -36,10 +36,7 @@ Firebase is integrated using **FlutterFire CLI**, which generates a `firebase_op
   - `isDone` (bool, default false)  
   - `createdAt` (Timestamp)  
 - **Initialization in `main.dart`:**
-```dart
-await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
+
 The firebase_options.dart file contains API keys for Android and iOS. These keys are safe to commit to version control.
 
 3. Features
